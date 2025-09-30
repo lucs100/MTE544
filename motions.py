@@ -9,7 +9,6 @@ from rclpy.qos import QoSProfile
 # DONE Part 3: Import message types needed: 
     # For sending velocity commands to the robot: Twist
     # For the sensors: Imu, LaserScan, and Odometry
-# Check the online documentation to fill in the lines below
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import Imu
 from sensor_msgs.msg import LaserScan
@@ -17,8 +16,6 @@ from nav_msgs.msg import Odometry
 
 from rclpy.time import Time
 
-# You may add any other imports you may need/want to use below
-# import ...
 from rclpy.qos import QoSReliabilityPolicy
 
 # Set whether we are simulating or not
@@ -44,7 +41,7 @@ class motion_executioner(Node):
         self.laser_initialized=False
         
         # DONE Part 3: Create a publisher to send velocity commands by setting the proper parameters in (...)
-        self.vel_publisher=self.create_publisher(Odometry, "/odom", 10)
+        self.vel_publisher=self.create_publisher(Odometry, "/odom", 10) #Using placeholder QoS
                 
         # loggers
         self.imu_logger=Logger('imu_content_'+str(motion_types[motion_type])+'.csv', headers=["acc_x", "acc_y", "angular_z", "stamp"])
@@ -52,6 +49,7 @@ class motion_executioner(Node):
         self.laser_logger=Logger('laser_content_'+str(motion_types[motion_type])+'.csv', headers=["ranges", "angle_increment", "stamp"])
         
         # DONE Part 3: Create the QoS profile by setting the proper parameters in (...)
+        # Guessing at depth and reliability for now
         if SIM_MODE:
             qos = QoSProfile(
                 depth=10,
@@ -82,10 +80,7 @@ class motion_executioner(Node):
 
 
     # DONE Part 5: Callback functions: complete the callback functions of the three sensors to log the proper data.
-    # To also log the time you need to use the rclpy Time class, each ros msg will come with a header, and then
-    # inside the header you have a stamp that has the time in seconds and nanoseconds, you should log it in nanoseconds as 
-    # such: Time.from_msg(imu_msg.header.stamp).nanoseconds
-    # You can save the needed fields into a list, and pass the list to the log_values function in utilities.py
+    # These all follow the expected headers in the loggers; some are guesses at the right field
 
     def imu_callback(self, imu_msg: Imu):
         params = [
