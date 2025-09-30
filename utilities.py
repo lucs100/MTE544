@@ -1,4 +1,5 @@
 from math import atan2, asin, sqrt
+from json import dumps
 
 M_PI=3.1415926535
 
@@ -23,8 +24,9 @@ class Logger:
         with open(self.filename, 'a') as file:
             vals_str=""
 
-            # TODO Part 5: Write the values from the list to the file
-            ...
+            # DONE Part 5: Write the values from the list to the file
+            
+            vals_str += ", ".join(values_list)
             
             vals_str+="\n"
             
@@ -79,12 +81,18 @@ class FileReader:
         return headers, table
 
 
-# TODO Part 5: Implement the conversion from Quaternion to Euler Angles
+# DONE Part 5: Implement the conversion from Quaternion to Euler Angles
 def euler_from_quaternion(quat):
     """
     Convert quaternion (w in last place) to euler roll, pitch, yaw.
     quat = [x, y, z, w]
     """
+    assert len(quat) == 4, f"The provided quaternion had {len(quat)} elements (expected 4)."
+    x, y, z, w = quat
+
+    # assume phi = [ 0 0 1 ]', so x = 0, y = 0, z = cos(yaw/2), w = sin(yaw/2)  
+    yaw = asin(w)*2
+
     ... # just unpack yaw
     return yaw
 
