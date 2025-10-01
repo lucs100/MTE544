@@ -17,6 +17,7 @@ from nav_msgs.msg import Odometry
 from rclpy.time import Time
 
 from rclpy.qos import QoSReliabilityPolicy
+from math import e
 
 # Set whether we are simulating or not
 SIM_MODE = False
@@ -41,7 +42,7 @@ class motion_executioner(Node):
         self.laser_initialized=False
         
         # DONE Part 3: Create a publisher to send velocity commands by setting the proper parameters in (...)
-        self.vel_publisher=self.create_publisher(Odometry, "/odom", 10) #Using placeholder QoS
+        self.vel_publisher=self.create_publisher(Twist, "/cmd_vel", 10) #Using placeholder QoS
                 
         # loggers
         self.imu_logger=Logger('imu_content_'+str(motion_types[motion_type])+'.csv', headers=["acc_x", "acc_y", "angular_z", "stamp"])
@@ -74,6 +75,7 @@ class motion_executioner(Node):
         
         self.laser_sub = self.create_subscription(LaserScan, "/scan", self.laser_callback, qos)
 
+        self.step_count = 0
 
         
         self.create_timer(0.1, self.timer_callback)
@@ -81,8 +83,12 @@ class motion_executioner(Node):
 
     # DONE Part 5: Callback functions: complete the callback functions of the three sensors to log the proper data.
     # These all follow the expected headers in the loggers; some are guesses at the right field
+    # Once we confirm we've recieved a message, set xxxxx_initialized to True 
 
     def imu_callback(self, imu_msg: Imu):
+        if not self.imu_initialized:
+            print("IMU ready!")
+            self.imu_initialized = True
         params = [
             imu_msg.linear_acceleration.x,
             imu_msg.linear_acceleration.y,
@@ -92,6 +98,9 @@ class motion_executioner(Node):
         self.imu_logger.log_values(params)
         
     def odom_callback(self, odom_msg: Odometry):
+        if not self.odom_initialized:
+            print("Odometer ready!")
+            self.odom_initialized = True
         params = [
             odom_msg.twist.twist.linear.x,
             odom_msg.twist.twist.linear.y,
@@ -101,6 +110,9 @@ class motion_executioner(Node):
         self.odom_logger.log_values(params)
                 
     def laser_callback(self, laser_msg: LaserScan):
+        if not self.laser_initialized:
+            print("LaserScan ready!")
+            self.laser_initialized = True
         params = [
             laser_msg.ranges,
             laser_msg.angle_increment,
@@ -137,34 +149,42 @@ class motion_executioner(Node):
     # DONE Part 4: Motion functions: complete the functions to generate the proper messages corresponding to the desired motions of the robot
 
     def make_circular_twist(self):
-        
         msg=Twist()
-        msg.linear.x = 0.1
-        msg.linear.y = 0
-        msg.linear.z = 0
-        msg.angular.x = 0
-        msg.angular.y = 0
-        msg.angular.z = 0.1
+        msg.linear.x = 0.4
+        msg.linear.y = 0.0
+        msg.linear.z = 0.0
+        msg.angular.x = 0.0
+        msg.angular.y = 0.0
+        msg.angular.z = 1.0
+
         return msg
 
     def make_spiral_twist(self):
+        calcLinX = min(0.4, 0.1 + 0.05*e**(self.step_count/50))
+        calcAngZ = max(0.5, 5/e**(self.step_count/50))
+        print(f"Sending spiral... {self.step_count} / [x: {calcLinX} z: {calcAngZ}]")
+        self.step_count += 1
         msg=Twist()
-        msg.linear.x = 0.2
-        msg.linear.y = 0
-        msg.linear.z = 0
-        msg.angular.x = 0
-        msg.angular.y = 0
-        msg.angular.z = 0.1
+        msg.linear.x = calcLinX
+        msg.linear.y = 0.0
+        msg.linear.z = 0.0
+        msg.angular.x = 0.0
+        msg.angular.y = 0.0
+        msg.angular.z = calcAngZ
         return msg
     
     def make_acc_line_twist(self):
+        calcLinX = min(1, 0.15*e**(self.step_count/50))
+        print(f"Sending acceleration line... {self.step_count} / [x: {calcLinX}]")
+        self.step_count += 1
         msg=Twist()
-        msg.linear.x = 0.2
-        msg.linear.y = 0
-        msg.linear.z = 0
-        msg.angular.x = 0
-        msg.angular.y = 0
-        msg.angular.z = 0
+        msg.linear.x = calcLinX
+        msg.linear.y = 0.0
+        msg.linear.z = 0.0
+        msg.angular.x = 0.0
+        msg.angular.y = 0.0
+        msg.angular.z = 0.0
+
         return msg
 
 import argparse
