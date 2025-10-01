@@ -19,7 +19,7 @@ from rclpy.time import Time
 from rclpy.qos import QoSReliabilityPolicy
 
 # Set whether we are simulating or not
-SIM_MODE = True
+SIM_MODE = False
 
 
 CIRCLE=0; SPIRAL=1; ACC_LINE=2
@@ -58,7 +58,7 @@ class motion_executioner(Node):
         else:
             qos = QoSProfile(
                 depth=50,
-                reliability=QoSReliabilityPolicy.RELIABLE
+                reliability=QoSReliabilityPolicy.BEST_EFFORT,
             )
 
         # DONE Part 5: Create below the subscription to the topics corresponding to the respective sensors
@@ -139,27 +139,27 @@ class motion_executioner(Node):
     def make_circular_twist(self):
         
         msg=Twist()
-        msg.linear.x = 1
+        msg.linear.x = 0.1
         msg.linear.y = 0
         msg.linear.z = 0
         msg.angular.x = 0
         msg.angular.y = 0
-        msg.angular.z = 1
+        msg.angular.z = 0.1
         return msg
 
     def make_spiral_twist(self):
         msg=Twist()
-        msg.linear.x = 2
+        msg.linear.x = 0.2
         msg.linear.y = 0
         msg.linear.z = 0
         msg.angular.x = 0
         msg.angular.y = 0
-        msg.angular.z = 1
+        msg.angular.z = 0.1
         return msg
     
     def make_acc_line_twist(self):
         msg=Twist()
-        msg.linear.x = 2
+        msg.linear.x = 0.2
         msg.linear.y = 0
         msg.linear.z = 0
         msg.angular.x = 0
