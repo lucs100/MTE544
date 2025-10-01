@@ -26,7 +26,7 @@ class Logger:
 
             # DONE Part 5: Write the values from the list to the file
             
-            vals_str += ", ".join(values_list)
+            vals_str += ", ".join(str(x) for x in values_list)
             
             vals_str+="\n"
             
