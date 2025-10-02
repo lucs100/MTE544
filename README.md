@@ -163,7 +163,7 @@ You do not have to map the entire room, just a sufficient area to see a portion 
 
 **IMPORTANT!! Before you leave, DELETE all of your codes, map files, etc.**
 
-## Conclusions - Written report (15 marks)
+## [Done] Conclusions - Written report (15 marks)
 You can do this part in the lab (time allowing) or at home.
 
 Please prepare a written report containing in the front page:
@@ -176,7 +176,7 @@ In a maximum of 2 pages (excluding the front page), report the following:
 - A screenshot of your obtained map.
 - A brief explanation of the obtained plots (can be in the figure captions), and a brief discussion (interpretation, quality, etc) to show your understanding of the sensor information. *Hint*: you may leverage on the course material and the online documentation of the messages to better interpret your data.
 
-## Submission
+## [Done] Submission
 
 Submit the report and the code on Dropbox (LEARN) in the corresponding folder. Only one submission per group is needed:
 - **Report**: one single pdf;
