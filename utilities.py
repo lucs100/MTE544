@@ -10,13 +10,14 @@ class Logger:
 
         with open(self.filename, 'w') as file:
             
-            header_str=""
+            header_str = ", ".join(str(h) for h in headers) + "\n"
+            # header_str=""
 
-            for header in headers:
-                header_str+=header
-                header_str+=", "
+            # for header in headers:
+            #     header_str+=header
+            #     header_str+=", "
             
-            header_str+="\n"
+            # header_str+="\n"
             
             file.write(header_str)
 
@@ -25,10 +26,7 @@ class Logger:
 
         with open(self.filename, 'a') as file:
             
-            vals_str=""
-            
-            for value in values_list:
-                vals_str+=f"{value}, "
+            vals_str += ", ".join(str(x) for x in values_list)
             
             vals_str+="\n"
             
@@ -36,7 +34,7 @@ class Logger:
             
 
     def save_log(self):
-        pass
+        pass #???
 
 class FileReader:
     def __init__(self, filename):
@@ -89,8 +87,13 @@ def euler_from_quaternion(quat):
     Convert quaternion (w in last place) to euler roll, pitch, yaw.
     quat = [x, y, z, w]
     """
+    assert len(quat) == 4, f"The provided quaternion had {len(quat)} elements (expected 4)."
+    x, y, z, w = quat
 
-    # just unpack yaw
+    # assume phi = [ 0 0 1 ]', so x = 0, y = 0, z = cos(yaw/2), w = sin(yaw/2)  
+    yaw = asin(w)*2
+
+    ... # just unpack yaw
     return yaw
 
 
