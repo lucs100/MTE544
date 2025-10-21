@@ -31,10 +31,10 @@ class localization(Node):
             print("This type doesn't exist", sys.stderr)
     
     
-    def odom_callback(self, pose_msg):
+    def odom_callback(self, pose_msg): #TODO: get type hint here for indexing
         
         # TODO Part 3: Read x,y, theta, and record the stamp
-        self.pose=[ ... ]
+        self.pose=[pose_msg.x, pose_msg.y, pose_msg.theta, pose_msg.stamp] #need to check attribute names
         
         # Log the data
         self.loc_logger.log_values([self.pose[0], self.pose[1], self.pose[2], Time.from_msg(self.pose[3]).nanoseconds])
@@ -42,7 +42,10 @@ class localization(Node):
     def getPose(self):
         return self.pose
 
-# TODO Part 3
+# TODO Part 3:
 # Here put a guard that makes the node run, ONLY when run as a main thread!
 # This is to make sure this node functions right before using it in decision.py
     
+if __name__ == "__main__":
+    myNode = localization()
+    myNode.run() #check function name
