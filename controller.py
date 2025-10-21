@@ -24,14 +24,13 @@ class controller:
         e_lin=calculate_linear_error(pose, goal)
         e_ang=calculate_angular_error(pose, goal)
 
-
         linear_vel=self.PID_linear.update([e_lin, pose[3]], status)
         angular_vel=self.PID_angular.update([e_ang, pose[3]], status)
         
-        # TODO Part 4: Add saturation limits for the robot linear and angular velocity (hint: you can use np.clip function)
+        # DONE Part 4: Add saturation limits for the robot linear and angular velocity (hint: you can use np.clip function)
 
-        linear_vel = ... 
-        angular_vel= ... 
+        linear_vel  = np.clip(linear_vel, 0, 0.46) # m/s
+        angular_vel = np.clip(angular_vel, 0, 1.9) # rad/s 
         
         return linear_vel, angular_vel
     
@@ -51,14 +50,13 @@ class trajectoryController(controller):
         e_lin=calculate_linear_error(pose, finalGoal)
         e_ang=calculate_angular_error(pose, goal)
 
-        
         linear_vel=self.PID_linear.update([e_lin, pose[3]], status)
         angular_vel=self.PID_angular.update([e_ang, pose[3]], status) 
 
-        # TODO Part 5: Add saturation limits for the robot linear and angular velocity (hint: you can use np.clip function)
+        # DONE Part 5: Add saturation limits for the robot linear and angular velocity (hint: you can use np.clip function)
 
-        linear_vel = ... 
-        angular_vel= ... 
+        linear_vel  = np.clip(linear_vel, 0, 0.46) # m/s
+        angular_vel = np.clip(angular_vel, 0, 1.9) # rad/s 
         
         return linear_vel, angular_vel
 
