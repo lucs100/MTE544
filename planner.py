@@ -1,6 +1,7 @@
 # Type of planner
 POINT_PLANNER=0; TRAJECTORY_PLANNER=1
 
+from math import e
 
 
 class planner:
@@ -25,7 +26,23 @@ class planner:
 
     # TODO Part 6: Implement the trajectories here
     def trajectory_planner(self):
-        pass
-        # the return should be a list of trajectory points: [ [x1,y1], ..., [xn,yn]]
-        # return 
+        mode = "parabola"
+        # Need to figure out how to choose one to return...
+        if mode == "parabola":
+            ## For parabola:
+            x = [el / 100 for el in range(0, 150 + 5, 5)]
+            y = []
+            for el in x:
+                y.append(round( el**2 , 4))
+            points = list(zip(x, y))
+
+        else:
+            # For sigmoid:
+            x = [el / 100 for el in range(0, 250 + 5, 5)]
+            y = []
+            for el in x:
+                y.append(round( (2 / (1 + e ** (-2 * x))) - 1 , 4)) 
+            points = list(zip(x, y))
+        
+        return points
 
