@@ -1,5 +1,5 @@
 # Type of planner
-POINT_PLANNER=0; TRAJECTORY_PLANNER=1
+POINT_PLANNER=0; PARABOLA_PLANNER=1; SIGMOID_PLANNER=2 
 
 from math import e
 
@@ -15,8 +15,11 @@ class planner:
         if self.type==POINT_PLANNER:
             return self.point_planner(goalPoint)
         
-        elif self.type==TRAJECTORY_PLANNER:
-            return self.trajectory_planner()
+        elif self.type==PARABOLA_PLANNER:
+            return self.parabola_planner()
+
+        elif self.type==SIGMOID_PLANNER:
+            return self.sigmoid_planner()
 
 
     def point_planner(self, goalPoint):
@@ -24,25 +27,20 @@ class planner:
         y = goalPoint[1]
         return x, y
 
-    # TODO Part 6: Implement the trajectories here
-    def trajectory_planner(self):
-        mode = "parabola"
-        # Need to figure out how to choose one to return...
-        if mode == "parabola":
-            ## For parabola:
-            x = [el / 100 for el in range(0, 150 + 5, 5)]
-            y = []
-            for el in x:
-                y.append(round( el**2 , 4))
-            points = list(zip(x, y))
+    # DONE Part 6: Implement the trajectories here
+    def parabola_planner(self):
+        x = [el / 100 for el in range(0, 150 + 5, 5)]
+        y = []
+        for el in x:
+            y.append(round( el**2 , 4))
+            
+        return list(zip(x, y))
 
-        else:
-            # For sigmoid:
-            x = [el / 100 for el in range(0, 250 + 5, 5)]
-            y = []
-            for el in x:
-                y.append(round( (2 / (1 + e ** (-2 * x))) - 1 , 4)) 
-            points = list(zip(x, y))
+    def sigmoid_planner(self):
+        x = [el / 100 for el in range(0, 250 + 5, 5)]
+        y = []
+        for el in x:
+            y.append(round( (2 / (1 + e ** (-2 * x))) - 1 , 4)) 
         
-        return points
+        return list(zip(x, y))
 

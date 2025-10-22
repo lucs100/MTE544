@@ -14,7 +14,7 @@ from nav_msgs.msg import Odometry as odom
 
 from localization import localization, rawSensor
 
-from planner import TRAJECTORY_PLANNER, POINT_PLANNER, planner
+from planner import POINT_PLANNER, PARABOLA_PLANNER, SIGMOID_PLANNER, planner
 from controller import controller, trajectoryController
 
 # You may add any other imports you may need/want to use below
@@ -43,9 +43,13 @@ class decision_maker(Node):
             self.controller=controller(klp=0.2, klv=0.5, kap=0.8, kav=0.6)
             self.planner=planner(POINT_PLANNER)    
     
-        elif motion_type==TRAJECTORY_PLANNER:
+        elif motion_type==PARABOLA_PLANNER:
             self.controller=trajectoryController(klp=0.2, klv=0.5, kap=0.8, kav=0.6)
-            self.planner=planner(TRAJECTORY_PLANNER)
+            self.planner=planner(PARABOLA_PLANNER)
+    
+        elif motion_type==SIGMOID_PLANNER:
+            self.controller=trajectoryController(klp=0.2, klv=0.5, kap=0.8, kav=0.6)
+            self.planner=planner(SIGMOID_PLANNER)
 
         else:
             print("Error! you don't have this planner", file=sys.stderr)
@@ -115,8 +119,10 @@ def main(args=None):
     # DONE Part 4: instantiate the decision_maker with the proper parameters for moving the robot
     if args.motion.lower() == "point":
         motionType = POINT_PLANNER
-    elif args.motion.lower() == "trajectory":
-        motionType = TRAJECTORY_PLANNER
+    elif args.motion.lower() == "parabola":
+        motionType = PARABOLA_PLANNER
+    elif args.motion.lower() == "sigmoid":
+        motionType = SIGMOID_PLANNER
     else:
         print("invalid motion type", file=sys.stderr)       
         exit()
@@ -138,8 +144,7 @@ def main(args=None):
 
 
 if __name__=="__main__":
-
-    argParser=argparse.ArgumentParser(description="point or trajectory") 
+    argParser=argparse.ArgumentParser(description="point, parabola, or sigmoid") 
     argParser.add_argument("--motion", type=str, default="point")
     args = argParser.parse_args()
 
