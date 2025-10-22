@@ -80,8 +80,8 @@ class decision_maker(Node):
 
         # DONE Part 3: Check if you reached the goal
         if type(self.goal) == list:
-            err_linear = calculate_linear_error(self.localizer.getPose(), self.goal) <= lin_error_thresh
-            err_angular = calculate_angular_error(self.localizer.getPose(), self.goal) <= ang_error_thresh
+            err_linear = abs(calculate_linear_error(self.localizer.getPose(), self.goal)) <= lin_error_thresh
+            err_angular = abs(calculate_angular_error(self.localizer.getPose(), self.goal)) <= ang_error_thresh
             reached_goal = (err_linear <= lin_error_thresh) and (err_angular <= ang_error_thresh)
         else: 
             reached_goal = False # No goal is set yet
