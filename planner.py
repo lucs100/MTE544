@@ -25,22 +25,22 @@ class planner:
     def point_planner(self, goalPoint):
         x = goalPoint[0]
         y = goalPoint[1]
-        return x, y
+        return (x, y)
 
     # DONE Part 6: Implement the trajectories here
     def parabola_planner(self):
         x = [el / 100 for el in range(0, 150 + 5, 5)]
-        y = []
+        points = []
         for el in x:
-            y.append(round( el**2 , 4))
+            points.append((el, round( el**2 , 4)))
             
-        return list(zip(x, y))
+        return points
 
     def sigmoid_planner(self):
         x = [el / 100 for el in range(0, 250 + 5, 5)]
-        y = []
+        points = []
         for el in x:
-            y.append(round( (2 / (1 + e ** (-2 * x))) - 1 , 4)) 
+            points.append((el, round( (2 / (1 + e ** (-2 * x))) - 1 , 4))) 
         
-        return list(zip(x, y))
+        return points
 

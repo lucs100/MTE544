@@ -55,10 +55,10 @@ class PID_ctrl:
         
         for i in range(1, len(self.history)):
             
-            t0=Time.from_msg(self.history[i-1][1])
-            t1=Time.from_msg(self.history[i][1])
+            t0=self.history[i-1][1] #no need to cast to Time, it's just an int (in nanoseconds)
+            t1=self.history[i][1]
             
-            dt=(t1.nanoseconds - t0.nanoseconds) / 1e9
+            dt=(t1 - t0) / 1e9
             
             dt_avg+=dt
 

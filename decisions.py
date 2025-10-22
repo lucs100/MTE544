@@ -40,7 +40,7 @@ class decision_maker(Node):
         # TODO Part 5: Tune your parameters here
     
         if motion_type == POINT_PLANNER:
-            self.controller=controller(klp=0.2, klv=0.5, kap=0.8, kav=0.6)
+            self.controller=controller(klp=0.3, klv=0.8, kap=0.2, kav=2)
             self.planner=planner(POINT_PLANNER)    
     
         elif motion_type==PARABOLA_PLANNER:
@@ -54,6 +54,7 @@ class decision_maker(Node):
         else:
             print("Error! you don't have this planner", file=sys.stderr)
 
+        self.goalIdx = 0
 
         # Instantiate the localization, use rawSensor for now  
         self.localizer=localization(rawSensor)
@@ -75,16 +76,22 @@ class decision_maker(Node):
             return
 
         vel_msg=Twist()
-        lin_error_thresh = 1
-        ang_error_thresh = 1
+        lin_error_thresh = 0.05
+        # ang_error_thresh = 0.15
 
         # DONE Part 3: Check if you reached the goal
         if type(self.goal) == list:
-            err_linear = abs(calculate_linear_error(self.localizer.getPose(), self.goal)) <= lin_error_thresh
-            err_angular = abs(calculate_angular_error(self.localizer.getPose(), self.goal)) <= ang_error_thresh
-            reached_goal = (err_linear <= lin_error_thresh) and (err_angular <= ang_error_thresh)
-        else: 
-            reached_goal = False # No goal is set yet
+            currentGoal = self.goal[self.goalIdx]
+            print(currentGoal)
+            err_linear = abs(calculate_linear_error(self.localizer.getPose(), currentGoal))
+            # err_angular = abs(calculate_angular_error(self.localizer.getPose(), self.goal))
+            # reached_goal = (err_linear <= lin_error_thresh) and (err_angular <= ang_error_thresh)
+            if err_linear <= lin_error_thresh:
+                self.goalIdx += 1
+            reached_goal = self.goalIdx >= len(self.goal)
+        else: #Goal is a single point
+            err_linear = abs(calculate_linear_error(self.localizer.getPose(), self.goal))
+            reached_goal = err_linear <= lin_error_thresh
         
         if reached_goal:
             print("reached goal")
@@ -99,9 +106,8 @@ class decision_maker(Node):
         velocity, yaw_rate = self.controller.vel_request(self.localizer.getPose(), self.goal, True)
 
         #DONE Part 4: Publish the velocity to move the robot
-        vel_msg.linear.x = velocity.x
-        vel_msg.linear.y = velocity.y
-        vel_msg.angular.z = yaw_rate
+        vel_msg.linear.x = velocity #just forward velocity
+        vel_msg.angular.z = yaw_rate #turn rate 
         self.publisher.publish(vel_msg)
 
 import argparse
@@ -124,12 +130,12 @@ def main(args=None):
     elif args.motion.lower() == "sigmoid":
         motionType = SIGMOID_PLANNER
     else:
-        print("invalid motion type", file=sys.stderr)       
+        print("invalid motion type", file=sys.stderr) 
         exit()
     
     myPlanner = planner(motionType)
     DM = decision_maker(
-        publisher_msg=odom,
+        publisher_msg=Twist,
         publishing_topic="/cmd_vel",
         qos_publisher=odom_qos,
         goalPoint=myPlanner.plan(),
