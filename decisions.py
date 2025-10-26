@@ -40,7 +40,7 @@ class decision_maker(Node):
         # TODO Part 5: Tune your parameters here
     
         if motion_type == POINT_PLANNER:
-            self.controller=controller(klp=0.3, klv=0.8, kap=0.2, kav=2)
+            self.controller=controller(klp=0.5, klv=0.8, kap=0.5, kav=2)
             self.planner=planner(POINT_PLANNER)    
     
         elif motion_type==PARABOLA_PLANNER:
@@ -104,6 +104,7 @@ class decision_maker(Node):
             raise SystemExit
         
         velocity, yaw_rate = self.controller.vel_request(self.localizer.getPose(), self.goal, True)
+        print(f"Setting velocity to {velocity} and yaw rate to {yaw_rate}")
 
         #DONE Part 4: Publish the velocity to move the robot
         vel_msg.linear.x = velocity #just forward velocity
@@ -120,7 +121,8 @@ def main(args=None):
     # DONE Part 3: You migh need to change the QoS profile based on whether you're using the real robot or in simulation.
     # Remember to define your QoS profile based on the information available in "ros2 topic info /odom --verbose" as explained in Tutorial 3
     
-    odom_qos=QoSProfile(reliability=2, durability=2, history=1, depth=10)
+    # odom_qos=QoSProfile(reliability=2, durability=2, history=1, depth=10) #For lab
+    odom_qos=QoSProfile(reliability=1, durability=1, history=1, depth=10) #For simulation
 
     # DONE Part 4: instantiate the decision_maker with the proper parameters for moving the robot
     if args.motion.lower() == "point":
