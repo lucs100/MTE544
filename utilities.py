@@ -142,10 +142,11 @@ def calculate_angular_error(current_pose, goal_pose):
     error_angular = min(M_PI, error_angular)
     error_angular = max(-M_PI, error_angular)
     
-    print(f"XY: ({(current_pose[0]):.2f}, {(current_pose[1]):.2f}) -> ({(goal_pose[0]):.2f}, {(goal_pose[1]):.2f}): "
-          f"({(goal_pose[0]-current_pose[0]):.2f}, {(goal_pose[1]-current_pose[1]):.2f})\t"
-          f"Th_b: {bestHeading:.2f} "
-          f"Th_c: {currentHeading:.2f} "
-          f"E_th: {error_angular:.2f} ")
+    # Print some debug info
+    print(f"\nXY: Current: ({(current_pose[0]):.2f}, {(current_pose[1]):.2f}) Goal: ({(goal_pose[0]):.2f}, {(goal_pose[1]):.2f}): "
+          f"To goal: ({(goal_pose[0]-current_pose[0]):.2f}, {(goal_pose[1]-current_pose[1]):.2f}) Error: {calculate_linear_error(current_pose, goal_pose):.2f}\n"
+          f"Theta: To goal: {bestHeading:.2f} "
+          f"Current: {currentHeading:.2f} "
+          f"Error: {error_angular:.2f} ")
     
     return error_angular
