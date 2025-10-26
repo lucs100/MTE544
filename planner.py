@@ -1,7 +1,7 @@
 # Type of planner
 POINT_PLANNER=0; PARABOLA_PLANNER=1; SIGMOID_PLANNER=2 
 
-from math import e
+from math import e as M_E
 
 
 class planner:
@@ -22,7 +22,7 @@ class planner:
             return self.sigmoid_planner()
 
 
-    def point_planner(self, goalPoint=[5, -2]):
+    def point_planner(self, goalPoint=[0, 0]):
         # A single point; should still be a nested list
         x = goalPoint[0]
         y = goalPoint[1]
@@ -34,8 +34,9 @@ class planner:
         # Calculates a parabola by creating a list of x,y pairs 
         x = [el / 100 for el in range(0, 150 + 5, 5)]
         points = []
-        for el in x:
-            points.append((el, round( el**2 , 4)))
+        for _x in x: #_x is the current element
+            y = _x**2
+            points.append([_x, round(y, 4)])
             
         return points
 
@@ -43,8 +44,9 @@ class planner:
         # Calculates a sigmoid by creating a list of x,y pairs 
         x = [el / 100 for el in range(0, 250 + 5, 5)]
         points = []
-        for el in x:
-            points.append((el, round( (2 / (1 + e ** (-2 * x))) - 1 , 4))) 
+        for _x in x:
+            y = (2 / (1 + M_E ** (-2 * _x))) - 1
+            points.append([_x, round(  y, 4)]) 
         
         return points
 

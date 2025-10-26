@@ -25,11 +25,13 @@ class controller:
     def __init__(self, klp=0.2, klv=0.2, kli=0.2, kap=0.2, kav=0.2, kai=0.2):
         
         # TODO Part 5 and 6: Modify the below lines to test your PD, PI, and PID controller
-        self.PID_linear=PID_ctrl(PI, klp, klv, kli, filename_="linear.csv")
-        self.PID_angular=PID_ctrl(PI, kap, kav, kai, filename_="angular.csv")
+        self.PID_linear=PID_ctrl(PID, klp, klv, kli, filename_="linear.csv")
+        self.PID_angular=PID_ctrl(PID, kap, kav, kai, filename_="angular.csv")
 
     
     def vel_request(self, pose, goal, status):
+        goal = goal[0] #Handle single-point goal
+
         # Calculate the error and return the optimal linear and angular velocities from the PID controller
         e_lin=calculate_linear_error(pose, goal)
         e_ang=calculate_angular_error(pose, goal)
@@ -73,6 +75,7 @@ class trajectoryController(controller):
         poseArray=np.array([pose[0], pose[1]]) 
         listGoalsArray=np.array(listGoals)
 
+        # really not sure what this code is doing, not very self explanatory. 
         distanceSquared=np.sum((listGoalsArray-poseArray)**2,
                                axis=1)
         closestIndex=np.argmin(distanceSquared)

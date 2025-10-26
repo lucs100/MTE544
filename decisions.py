@@ -40,15 +40,15 @@ class decision_maker(Node):
         # TODO Part 5: Tune your parameters here
     
         if motion_type == POINT_PLANNER:
-            self.controller=controller(klp=0.5, klv=0.8, kap=0.5, kav=2)
+            self.controller=controller(klp=1.4, klv=0.025, kli=0.075, kap=1, kav=0.0025, kai=0.15)
             self.planner=planner(POINT_PLANNER)    
     
         elif motion_type==PARABOLA_PLANNER:
-            self.controller=trajectoryController(klp=0.2, klv=0.5, kap=0.8, kav=0.6)
+            self.controller=trajectoryController(klp=1.4, klv=0.025, kli=0.075, kap=1, kav=0.0025, kai=0.15)
             self.planner=planner(PARABOLA_PLANNER)
     
         elif motion_type==SIGMOID_PLANNER:
-            self.controller=trajectoryController(klp=0.2, klv=0.5, kap=0.8, kav=0.6)
+            self.controller=trajectoryController(klp=1.4, klv=0.025, kli=0.075, kap=1, kav=0.0025, kai=0.15)
             self.planner=planner(SIGMOID_PLANNER)
 
         else:
@@ -76,24 +76,21 @@ class decision_maker(Node):
             return
 
         vel_msg=Twist()
-        lin_error_thresh = 0.02
+        lin_error_thresh = 0.005
         # We only need to check the linear error - we don't really care about what direction the robot is facing at the goal
 
         # DONE Part 3: Check if you reached the goal
         if type(self.goal) == list:
-            # Goal is a list of points, so let's check against the current point
-            currentGoal = self.goal[self.goalIdx]
-            print(f"Current goal [index #{self.goalIdx}]: {currentGoal}")
-            err_linear = abs(calculate_linear_error(self.localizer.getPose(), currentGoal))
-            
-            # If we've reached the current goal point, then advance the goal index
-            if err_linear <= lin_error_thresh:
-                self.goalIdx += 1
+            # Check our distance against the ultimate waypoint
+            finalGoal = self.goal[-1]
+            err_linear = abs(calculate_linear_error(self.localizer.getPose(), finalGoal))
             # If we've reached the final goal point, then set the reached_goal flag
-            reached_goal = self.goalIdx >= len(self.goal)
+            reached_goal = err_linear <= lin_error_thresh
+
         else: 
             # Goal is a single point, so let's check if we're there
-            # Extract as currentGoal so we can reuse code below
+            # Branch is unused after refactor to always use nested lists
+            # Extract as currentGoal so we can reuse code
             currentGoal = self.goal
             err_linear = abs(calculate_linear_error(self.localizer.getPose(), currentGoal))
             reached_goal = err_linear <= lin_error_thresh
@@ -110,8 +107,8 @@ class decision_maker(Node):
             raise SystemExit
         
         # If we haven't reached the goal, then update our speeds using the PID controller
-        velocity, yaw_rate = self.controller.vel_request(self.localizer.getPose(), currentGoal, True)
-        print(f"Setting velocity to {velocity} and yaw rate to {yaw_rate}")
+        velocity, yaw_rate = self.controller.vel_request(self.localizer.getPose(), self.goal, True)
+        print(f"Setting velocity to {velocity:.2f} and yaw rate to {yaw_rate:.2f}")
 
         #DONE Part 4: Publish the velocity to move the robot
         vel_msg.linear.x = velocity #just forward velocity
@@ -132,17 +129,21 @@ def main(args=None):
     else:
         odom_qos=QoSProfile(reliability=2, durability=2, history=1, depth=10) #For lab
 
-    # DONE Part 4: instantiate the decision_maker with the proper parameters for moving the robot
-    # The only difference between the modes is the motionType argument so we can pull this out
-    if args.motion.lower() == "point":
-        motionType = POINT_PLANNER
-    elif args.motion.lower() == "parabola":
-        motionType = PARABOLA_PLANNER
-    elif args.motion.lower() == "sigmoid":
+    # Set motion type manually in sim mode to get around command line restrictions
+    if SIM_MODE:
         motionType = SIGMOID_PLANNER
     else:
-        print("invalid motion type", file=sys.stderr) 
-        exit()
+        # DONE Part 4: instantiate the decision_maker with the proper parameters for moving the robot
+        # The only difference between the modes is the motionType argument so we can pull this out
+        if args.motion.lower() == "point":
+            motionType = POINT_PLANNER
+        elif args.motion.lower() == "parabola":
+            motionType = PARABOLA_PLANNER
+        elif args.motion.lower() == "sigmoid":
+            motionType = SIGMOID_PLANNER
+        else:
+            print("invalid motion type", file=sys.stderr) 
+            exit()
     
     # Instantiate the decision maker using the chosen motion type
     DM = decision_maker(
