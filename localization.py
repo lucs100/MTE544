@@ -4,12 +4,12 @@ from utilities import Logger, euler_from_quaternion
 from rclpy.time import Time
 from rclpy.node import Node
 
-from rclpy.qos import QoSProfile, QoSReliabilityPolicy
+from rclpy.qos import QoSProfile
 from nav_msgs.msg import Odometry as Odom #capital since it's a class
 
 from rclpy import init, spin
 
-SIM_MODE = False
+from controller import SIM_MODE
 
 rawSensor = 0
 class localization(Node):
@@ -22,16 +22,10 @@ class localization(Node):
         # Remember to define your QoS profile based on the information available in "ros2 topic info /odom --verbose" as explained in Tutorial 3
 
         if SIM_MODE:
-            odom_qos = QoSProfile(
-                depth=10,
-                reliability=QoSReliabilityPolicy.BEST_EFFORT
-            )
+            odom_qos=QoSProfile(reliability=1, durability=2, history=1, depth=10) #Simulation
         else:
-            odom_qos = QoSProfile(
-                depth=50,
-                reliability=QoSReliabilityPolicy.BEST_EFFORT,
-            )
-        
+            odom_qos=QoSProfile(reliability=2, durability=2, history=1, depth=10) #Lab
+            
         self.loc_logger=Logger("robot_pose.csv", ["x", "y", "theta", "stamp"])
         self.pose=None
         

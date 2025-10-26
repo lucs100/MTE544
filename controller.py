@@ -8,6 +8,16 @@ M_PI=3.1415926535
 
 P=0; PD=1; PI=2; PID=3
 
+SIM_MODE = True
+
+# Set speed limits for the corresponding robot mode
+if SIM_MODE:
+    MAX_LIN_VEL = 0.22 # m/s
+    MAX_ANG_VEL = 2.84  # rad/s
+else:
+    MAX_LIN_VEL = 0.31 # m/s #Assume safe mode is enabled
+    MAX_ANG_VEL = 1.9  # rad/s
+
 class controller:
     
     
@@ -20,7 +30,7 @@ class controller:
 
     
     def vel_request(self, pose, goal, status):
-        
+        # Calculate the error and return the optimal linear and angular velocities from the PID controller
         e_lin=calculate_linear_error(pose, goal)
         e_ang=calculate_angular_error(pose, goal)
 
@@ -28,9 +38,8 @@ class controller:
         angular_vel=self.PID_angular.update([e_ang, pose[3]], status)
         
         # DONE Part 4: Add saturation limits for the robot linear and angular velocity (hint: you can use np.clip function)
-
-        linear_vel  = np.clip(linear_vel, -0, 0.46) # m/s
-        angular_vel = np.clip(angular_vel, -1.9, 1.9) # rad/s 
+        linear_vel  = np.clip(linear_vel, -0, MAX_LIN_VEL) # m/s
+        angular_vel = np.clip(angular_vel, -MAX_ANG_VEL, MAX_ANG_VEL) # rad/s 
         
         return linear_vel, angular_vel
     
@@ -38,7 +47,6 @@ class controller:
 class trajectoryController(controller):
 
     def __init__(self, klp=0.2, klv=0.2, kli=0.2, kap=0.2, kav=0.2, kai=0.2):
-        
         super().__init__(klp, klv, kli, kap, kav, kai)
     
     def vel_request(self, pose, listGoals, status):
@@ -55,8 +63,8 @@ class trajectoryController(controller):
 
         # DONE Part 5: Add saturation limits for the robot linear and angular velocity (hint: you can use np.clip function)
 
-        linear_vel  = np.clip(linear_vel, 0, 0.46) # m/s
-        angular_vel = np.clip(angular_vel, -1.9, 1.9) # rad/s 
+        linear_vel  = np.clip(linear_vel, -0, MAX_LIN_VEL) # m/s
+        angular_vel = np.clip(angular_vel, -MAX_ANG_VEL, MAX_ANG_VEL) # rad/s 
         
         return linear_vel, angular_vel
 
