@@ -167,37 +167,42 @@ class mapManipulator(Node):
         h = self.height
         return (np.array(np.floor((-origin + pos_array)/res), dtype=np.int32)) - np.array([0, h])
 
-    # TODO part 4: See through this method and explain how it works to the TA
+    # DONE? part 4: See through this method and explain how it works to the TA
     def make_likelihood_field(self):
         
+        # Get the current graymap
         image_array=self.image_array
 
         from sklearn.neighbors import KDTree
         
+        # Find all cells with a value less than 10 (occupied cells), and put their locations in an array
         indices = np.where(image_array < 10)
         indices_arr = np.array([indices[0], indices[1]]).T
-        
+        # Store the occupied cells in occupied_points
         occupied_points = self.cell_2_position(indices_arr)
+        
+        # Create a list of ALL points in the map
         all_indices = np.array([[i, j] for i in range(self.height) for j in range(self.width)])
         all_positions = self.cell_2_position(all_indices)
 
+        # Create a K-dimensional tree from the list of occupied points
         kdt=KDTree(occupied_points)
 
+        # Find the distance from all points to the nearest occupied point, and calculate the probability assuming a Gaussian distribution
         dists=kdt.query(all_positions, k=1)[0][:]
         probabilities=np.exp( -(dists**2) / (2*self.laser_sig**2))
         
+        # Reshape the probabilities matrix to match the image array 
         likelihood_field=probabilities.reshape(image_array.shape)
         
+        # Convert from 0-1 float occupancy to 0-255 integer occupancy
         likelihood_field_img=np.array(255-255*probabilities.reshape(image_array.shape), dtype=np.int32)
-        
-        self.likelihood_img=likelihood_field_img
-        
-        self.occ_points=np.array(occupied_points)
-        
-                
-        #self.plot_pgm_image(likelihood_field_img)
 
+        # Store the likelihood grid, occupied points, and likelihood field
+        self.likelihood_img=likelihood_field_img
+        self.occ_points=np.array(occupied_points)
         self.likelihood_field = likelihood_field
+        #self.plot_pgm_image(likelihood_field_img)
         
         return likelihood_field
                 
