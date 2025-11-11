@@ -14,7 +14,7 @@ from geometry_msgs.msg import Twist
 from rclpy.qos import QoSProfile
 from nav_msgs.msg import Odometry as odom
 
-from localization import localization, rawSensors, particlesFilter
+from localization import localization, RAW_SENSORS, PARTICLE_FILTER
 
 from planner import TRAJECTORY_PLANNER, POINT_PLANNER, planner
 from controller import controller, trajectoryController
@@ -45,8 +45,9 @@ class decision_maker(Node):
 
         self.reachThreshold=0.1
 
-        # TODO part 5: call the proper types
-        self.localizer=localization(...)
+        # DONE? part 5: call the proper types
+        # not exactly sure if we need to select one of these or change this? questionable
+        self.localizer=localization(PARTICLE_FILTER)
         
         if motion_type==POINT_PLANNER:
             self.controller=controller(klp=0.05, klv=0.0, kap=0.8, kav=0.0)      

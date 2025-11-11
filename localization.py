@@ -17,13 +17,11 @@ from rclpy import init, spin, spin_once
 import numpy as np
 import message_filters
 
-
-
-rawSensors=0; particlesFilter=1
-
+# Mode enum
+RAW_SENSORS=0; 
+PARTICLE_FILTER=1
 
 odom_qos=QoSProfile(reliability=2, durability=2, history=1, depth=10)
-
 
 class localization(Node):
     
@@ -31,14 +29,13 @@ class localization(Node):
 
         super().__init__("localizer")
         
-        self.loc_logger=Logger( loggerName , loggerHeaders)
+        self.loc_logger=Logger(loggerName , loggerHeaders)
         self.pose=None
         
-        
-        if type_==rawSensors:
+        if type_==RAW_SENSORS:
             self.initRawSensors()
 
-        elif type_==particlesFilter:
+        elif type_==PARTICLE_FILTER:
             self.initParticleFilter()
         else:
             print("We don't have this type for localization", sys.stderr)
@@ -56,21 +53,28 @@ class localization(Node):
         time_syncher.registerCallback(self.odom_and_pf_pose_callback)
 
     def odom_and_pf_pose_callback(self, odom_msg: odom, pf_msg: odom):
-        # TODO: You need to use the pf_msg to update the pose of the robot [x, y, theta, stamp]
-        self.pose=[ ... ]
+        # DONE: You need to use the pf_msg to update the pose of the robot [x, y, theta, stamp]
+        x = pf_msg.pose.pose.position.x
+        y = pf_msg.pose.pose.position.y
+        theta = euler_from_quaternion(pf_msg.pose.pose.orientation)
+        # stamp = Time.from_msg(pf_msg.header.stamp).nanoseconds
+        self.pose=[x, y, theta]
         
-        # TODO: You need to log the values from the odom and the particle filter based on the headers
-        # TODO: odom values: x, y, theta, vx, yawrate
-        odom_values_list = [...]
-        # TODO: pf values: x, y, theta
-        pf_values_list = [...]
+        # DONE: You need to log the values from the odom and the particle filter based on the headers
+        # DONE: odom values: x, y, theta, vx, yawrate
+        x = odom_msg.pose.pose.position.x
+        y = odom_msg.pose.pose.position.y
+        theta = euler_from_quaternion(odom_msg.pose.pose.orientation)
+        vx = odom_msg.twist.twist.linear.x #Velocity in the x-direction
+        yawrate = odom_msg.twist.twist.angular.z #Anglular velocity in the z-direction
+        odom_values_list = [x, y, theta, vx, yawrate]
+        # DONE: pf values: x, y, theta
+        pf_values_list = self.pose #Already determined with the pf values above [x, y have also been overwritten]
 
         stamp = Time.from_msg(odom_msg.header.stamp).nanoseconds
         # Put all the values in a list
         values_to_log = odom_values_list + pf_values_list + [stamp]
         self.loc_logger.log_values(values_to_log)
-
-        
     
     def odom_callback(self, pose_msg):
         self.pose=[ pose_msg.pose.pose.position.x,
@@ -89,10 +93,8 @@ class localization(Node):
 
 
 if __name__=="__main__":
-    
     init()
     
-    LOCALIZER=localization()
+    localizer = localization(PARTICLE_FILTER)
     
-    
-    spin(LOCALIZER)
+    spin(localizer)

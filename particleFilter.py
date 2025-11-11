@@ -30,7 +30,7 @@ from rclpy.time import Time
 
 class particleFilter(Node):
 
-    def __init__(self, mapFilename="your_map/room.yaml", numParticles=500):
+    def __init__(self, mapFilename="maps/playground/playground.yaml", numParticles=500):
 
         super().__init__("particleFiltering")
 
@@ -61,7 +61,7 @@ class particleFilter(Node):
         self.odomPosePublisher = self.create_publisher(Odometry, '/odom_pose', 10)
 
         # Create the map utilities object
-        # TODO: You can tune your laser_sig here
+        # OPTIONAL: You can tune your laser_sig here
         self.mapUtilities = mapManipulator(mapFilename, laser_sig=0.1)
         self.mapUtilities.make_likelihood_field()
         self.occ_map = self.mapUtilities.to_message()
@@ -99,8 +99,8 @@ class particleFilter(Node):
 
         numParticles = self.numParticles
 
-        # TODO: generate the particles around the initial pose (x, y, th) (you should use the std_particle_x, std_particle_y, std_particle_theta)
-        self.particlePoses = ... #size should be (numParticles, 3)
+        # DONE: Initialize the particle array to size (numParticles, 3)
+        self.particlePoses = np.repeat([[x, y, th]], numParticles, axis=0)
 
         self.particles = [particle(particle_, 1/numParticles) for particle_ in
                           self.particlePoses]
@@ -168,12 +168,13 @@ class particleFilter(Node):
         std_noise = 0.05
         generated_particles = []
 
+        # Extract and normalize the particle weights
         particles_weights = np.array([each_particle.getWeight() for each_particle in self.particles])
         # print("Sum of weights: ", np.sum(particles_weights))
         particles_weights = particles_weights / np.sum(particles_weights)
         
         # DONE: randomly sampling N particles from the list of particles based on their weights (hint: use np.random.choice)
-        sampled_particles = np.random.choice(self.particles, p=particles_weights)
+        sampled_particles = np.random.choice(self.particles, size=(self.numParticles), p=particles_weights)
 
         for bp in sampled_particles:
             x, y, th = bp.getPose()
