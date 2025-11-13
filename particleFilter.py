@@ -27,7 +27,7 @@ from tf2_ros.transform_listener import TransformListener
 from rclpy.time import Time
 
 class particleFilter(Node):
-    def __init__(self, mapFilename="maps/playground/playground.yaml", numParticles=500):
+    def __init__(self, mapFilename="maps/lab/room.yaml", numParticles=500):
         super().__init__("particleFiltering")
 
         # QoS profile for the subscribers
