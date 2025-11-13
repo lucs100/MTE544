@@ -14,11 +14,7 @@ from geometry_msgs.msg import Pose, PointStamped, Quaternion, Point
 from utilities import *
 
 class mapManipulator(Node):
-
-
-    def __init__(self, filename_: str = "room.yaml", laser_sig=0.1):
-        
-        
+    def __init__(self, filename_: str = "room.yaml", laser_sig=0.1):        
         super().__init__('likelihood_field')
         
         filenameYaml=None
@@ -48,7 +44,6 @@ class mapManipulator(Node):
         
         self.likelihood_msg=None
 
-
     def expand_image(self, image_array):
         """
         Expand the image array to avoid the edge effect
@@ -69,7 +64,6 @@ class mapManipulator(Node):
         indices_arr = np.array([indices[0], indices[1]]).T
         return self.cell_2_position(indices_arr)
         
-
     def getLikelihoodField(self):
         return self.likelihood_field
     
@@ -111,8 +105,6 @@ class mapManipulator(Node):
         plt.title('PGM Image')
         plt.show()
 
-
-
     def read_description(self, filenameYAML):
         import re
 
@@ -137,7 +129,6 @@ class mapManipulator(Node):
                     resolution = float(re.findall(r'\d+\.\d+', line)[0])
         return origin_x, origin_y, resolution, threshold
 
-
     def getOrigin(self):
         return np.array([self.o_x, self.o_y])
     
@@ -154,7 +145,6 @@ class mapManipulator(Node):
         res = self.getResolution()
         h = self.height
         return pix_array * res + origin + np.array([0, -h*res])
-    
     
     def position_2_cell(self, pos_array):
         """
@@ -205,7 +195,6 @@ class mapManipulator(Node):
         #self.plot_pgm_image(likelihood_field_img)
         
         return likelihood_field
-                
     
     def to_message(self):
         """ Return a nav_msgs/OccupancyGrid representation of this map. """
@@ -224,9 +213,7 @@ class mapManipulator(Node):
         grid.info.origin.orientation.z = np.sin(-np.pi/4)
         offset = -self.height*self.getResolution()
 
-
         grid.info.origin.position.x, grid.info.origin.position.y = self.getOrigin()[0], +self.getOrigin()[1] - offset
-
 
         # Flatten the likelihood field and scale it to [0, 100], set unknown as -1
         normalized_likelihood = np.clip(likelihoodField.T * 100, 0, 100)
@@ -237,20 +224,13 @@ class mapManipulator(Node):
 
         return grid
      
-
-
-
 import argparse
 if __name__=="__main__":
-    
-
-
     rclpy.init()
 
     parser=argparse.ArgumentParser()
     parser.add_argument('--map', type=str, default="./your_map/room.yaml", help='the absolute path to argument')
     parser.add_argument('--std', type=float, help='the std', default=0.01)
-
 
     args = parser.parse_args()
 
@@ -258,6 +238,6 @@ if __name__=="__main__":
 
     #rclpy.spin(MAP_UTILITIS)
 
-
 # Usage example
 
+# awesome!

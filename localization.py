@@ -8,7 +8,6 @@ from utilities import *
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 
-
 from rclpy.qos import QoSProfile
 from nav_msgs.msg import Odometry as odom
 
@@ -24,9 +23,7 @@ PARTICLE_FILTER=1
 odom_qos=QoSProfile(reliability=2, durability=2, history=1, depth=10)
 
 class localization(Node):
-    
     def __init__(self, type_, loggerName="robotPose.csv", loggerHeaders=["odom_x", "odom_y", "odom_th", "odom_vx", "odom_yawrate","pf_x","pf_y","pf_th","stamp"]):
-
         super().__init__("localizer")
         
         self.loc_logger=Logger(loggerName , loggerHeaders)
@@ -57,8 +54,10 @@ class localization(Node):
         x = pf_msg.pose.pose.position.x
         y = pf_msg.pose.pose.position.y
         theta = euler_from_quaternion(pf_msg.pose.pose.orientation)
-        # stamp = Time.from_msg(pf_msg.header.stamp).nanoseconds
-        self.pose=[x, y, theta]
+        stamp = pf_msg.header.stamp
+        self.pose=[x, y, theta, stamp]
+        # DONE: pf values: x, y, theta
+        pf_values_list = [x, y, theta]
         
         # DONE: You need to log the values from the odom and the particle filter based on the headers
         # DONE: odom values: x, y, theta, vx, yawrate
@@ -68,8 +67,6 @@ class localization(Node):
         vx = odom_msg.twist.twist.linear.x #Velocity in the x-direction
         yawrate = odom_msg.twist.twist.angular.z #Anglular velocity in the z-direction
         odom_values_list = [x, y, theta, vx, yawrate]
-        # DONE: pf values: x, y, theta
-        pf_values_list = self.pose #Already determined with the pf values above [x, y have also been overwritten]
 
         stamp = Time.from_msg(odom_msg.header.stamp).nanoseconds
         # Put all the values in a list
@@ -86,15 +83,11 @@ class localization(Node):
         # Put all the values in a list
         values_to_log = [pose_msg.pose.pose.position.x, pose_msg.pose.pose.position.y, euler_from_quaternion(pose_msg.pose.pose.orientation), pose_msg.twist.twist.linear.x, pose_msg.twist.twist.angular.z, 0, 0, 0, stamp]
         self.loc_logger.log_values(values_to_log)
-
         
     def getPose(self):
         return self.pose
 
-
 if __name__=="__main__":
     init()
-    
     localizer = localization(PARTICLE_FILTER)
-    
     spin(localizer)

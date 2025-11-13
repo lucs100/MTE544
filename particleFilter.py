@@ -1,7 +1,5 @@
-
-
 import rclpy
-from particle import particle
+from particle import Particle
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy
 from nav_msgs.msg import Odometry
@@ -29,9 +27,7 @@ from tf2_ros.transform_listener import TransformListener
 from rclpy.time import Time
 
 class particleFilter(Node):
-
     def __init__(self, mapFilename="maps/playground/playground.yaml", numParticles=500):
-
         super().__init__("particleFiltering")
 
         # QoS profile for the subscribers
@@ -102,7 +98,7 @@ class particleFilter(Node):
         # DONE: Initialize the particle array to size (numParticles, 3)
         self.particlePoses = np.repeat([[x, y, th]], numParticles, axis=0)
 
-        self.particles = [particle(particle_, 1/numParticles) for particle_ in
+        self.particles = [Particle(particle_, 1/numParticles) for particle_ in
                           self.particlePoses]
 
         self.weights = [1/numParticles] * numParticles
@@ -183,7 +179,7 @@ class particleFilter(Node):
             new_y = y + np.random.normal(0, std_noise)
             new_th = th + np.random.normal(0, std_noise)
 
-            new_particle = particle([new_x, new_y, new_th], bp.getWeight())
+            new_particle = Particle([new_x, new_y, new_th], bp.getWeight())
 
             new_particle.calculateParticleWeight(
                 laser_scan, mapUtilInstance, self.laser_to_ego_transform)

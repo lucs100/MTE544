@@ -1,12 +1,9 @@
-
 from mapUtilities import *
 from utilities import *
 from numpy import cos, sin
 import numpy as np
 
-
-class particle:
-
+class Particle:
     def __init__(self, pose, weight):
         self.pose = pose
         self.weight = weight
@@ -25,7 +22,6 @@ class particle:
 
     # DONE?: You need to explain the following function to TA
     def calculateParticleWeight(self, scanOutput: LaserScan, mapManipulatorInstance: mapManipulator, laser_to_ego_transformation: np.array):
-
         # Multiply the current orientation matrix with the laser_to_ego_transformation matrix
         # This will give us a transformation from the world frame to the ego frame
         T = np.matmul(self.poseToTranslationMatrix(), laser_to_ego_transformation)
@@ -81,8 +77,10 @@ class particle:
     def poseToTranslationMatrix(self):
         x, y, th = self.getPose()
 
-        translation = np.array([[cos(th), -sin(th), x],
-                                [sin(th), cos(th), y],
-                                [0, 0, 1]])
+        translation = np.array(
+            [[cos(th), -sin(th), x],
+            [sin(th), cos(th), y],
+            [0, 0, 1]]
+        )
 
         return translation
