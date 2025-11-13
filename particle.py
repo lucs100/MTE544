@@ -16,6 +16,7 @@ class Particle:
         dt: time step
         """
         theta = self.pose[2]
+        w += 1e-10
         self.pose[0] += (-v/w)*sin(theta) + (v/w)*sin(theta + w * dt) #x
         self.pose[1] += (+v/w)*cos(theta) - (v/w)*cos(theta + w * dt) #y
         self.pose[2] += w * dt #theta

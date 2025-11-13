@@ -40,7 +40,7 @@ class decision_maker(Node):
         self.localizer=localization(PARTICLE_FILTER)
         
         if motion_type==POINT_PLANNER:
-            self.controller=controller(klp=0.5, klv=0.0, kap=0.8, kav=0.0)      
+            self.controller=controller(klp=0.35, klv=0.0, kap=0.5, kav=0.0)      
             self.planner=planner(POINT_PLANNER)
         elif motion_type==TRAJECTORY_PLANNER:
             self.controller=trajectoryController(klp=0.2, klv=0.5, kap=0.8, kav=0.6)      
