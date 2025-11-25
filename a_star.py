@@ -23,6 +23,16 @@ class Node:
 
     def __eq__(self, other):
         return self.position == other.position
+    
+    def heuristic_distance(self, other: list, mode="manhattan"):
+        x1, y1 = self.position
+        x2, y2 = [other]
+        if mode == "manhattan":
+            return abs(x1-x2) + abs(y1-y2)
+        elif mode == "euclidian":
+            return sqrt((x2-x1)**2 + (y2-y1)**2)
+        else:
+            raise NotImplementedError("The passed mode was invalid.")
 
 # This function return the path of the search
 
@@ -70,17 +80,17 @@ def search(maze, start, end):
         print("Start or end is on a wall, or outside the boundaries of the maze")
         return None
     
-    # TODO PART 4 Create start and end node with initized values for g, h and f
+    # DONE PART 4 Create start and end node with initized values for g, h and f
     # Use None as parent if not defined
-    start_node = Node(...)
-    start_node.g = ...     # cost from start Node
-    start_node.h = ...     # heuristic estimated cost to end Node
-    start_node.f = ...
+    start_node = Node(parent=None, position=start)
+    start_node.g = 0            # cost from start Node
+    start_node.h = heuristic_distance(end)     # heuristic estimated cost to end Node
+    start_node.f = start_node.g + start_node.h
 
-    end_node = Node(...)
-    end_node.g = ...       # set a large value if not defined
-    end_node.h = ...       # heuristic estimated cost to end Node
-    end_node.f = ...
+    end_node = Node(parent=None, position=end)
+    end_node.g = 99999       # set a large value if not defined
+    end_node.h = 0       # heuristic estimated cost to end Node
+    end_node.f = end_node.g + end_node.h
 
     # Initialize both yet_to_visit and visited dictionary
     # in this dict we will put all node that are yet_to_visit for exploration.
@@ -135,13 +145,12 @@ def search(maze, start, end):
         # Every time any node is referred from yet_to_visit list, counter of limit operation incremented
         outer_iterations += 1
 
-        # TODO: Get the current node with the lowest f value
+        # DONE: Get the current node with the lowest f value
         current_node = None
         current_fscore = None
-        for position, node in yet_to_visit_dict.items():
-            if current_fscore is None or node.f < current_fscore:
-                current_fscore = ...
-                current_node = ...
+        for position, node in sorted(yet_to_visit_dict.items(), key=lambda n: n.f):
+            current_fscore = node.f
+            current_node = node
 
         # if we hit this point return the path such as it may be no solution or
         # computation cost is too high
@@ -166,8 +175,8 @@ def search(maze, start, end):
             # Get node position
             node_position = (current_node.position[0] + new_position[0], current_node.position[1] + new_position[1])
 
-            # TODO PART 4 Make sure within range (check if within maze boundary)
-            if (...):
+            # DONE PART 4 Make sure within range (check if within maze boundary)
+            if not (0 < node_position[0] <= no_rows and 0 < node_position[1] <= no_columns):
                 continue
 
             # Make sure walkable terrain
@@ -184,14 +193,14 @@ def search(maze, start, end):
 
         for child in children:
 
-            # TODO PART 4 Child is on the visited dict (use get method to check if child is in visited dict, if not found then default value is False)
-            if ():
+            # DONE PART 4 Child is on the visited dict (use get method to check if child is in visited dict, if not found then default value is False)
+            if visited_dict.get(child, False):
                 continue
 
-            # TODO PART 4 Create the f, g, and h values
-            child.g = ...
+            # DONE PART 4 Create the f, g, and h values
+            child.g = maze[child.position()]
             # Heuristic costs calculated here, this is using eucledian distance
-            child.h = ...
+            child.h = child.distance(goal.position)
 
             child.f = child.g + child.h
 
