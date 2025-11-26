@@ -2,6 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from math import sqrt
 
+MANHATTAN = 0
+EUCLIDIAN = 1
+
 
 class Node:
     """
@@ -24,12 +27,12 @@ class Node:
     def __eq__(self, other):
         return self.position == other.position
     
-    def heuristic_distance(self, other: list, mode="manhattan"):
+    def heuristic_distance(self, other: list, mode=MANHATTAN):
         x1, y1 = self.position
         x2, y2 = [other]
-        if mode == "manhattan":
+        if mode == MANHATTAN:
             return abs(x1-x2) + abs(y1-y2)
-        elif mode == "euclidian":
+        elif mode == EUCLIDIAN:
             return sqrt((x2-x1)**2 + (y2-y1)**2)
         else:
             raise NotImplementedError("The passed mode was invalid.")
