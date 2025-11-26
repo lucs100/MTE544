@@ -29,7 +29,7 @@ class Node:
     
     def heuristic_distance(self, other: list, mode=MANHATTAN):
         x1, y1 = self.position
-        x2, y2 = [other]
+        x2, y2 = other[0], other[1]
         if mode == MANHATTAN:
             return abs(x1-x2) + abs(y1-y2)
         elif mode == EUCLIDIAN:
@@ -74,6 +74,7 @@ def search(maze, start, end):
     # Get the shape of the maze
     no_rows, no_columns=np.shape(maze)
 
+    print(f"Start: {start} \t End: {end}")
     # Check if the start and end are within the boundaries of the maze, and if they are not on a blocked path
     if (start[0] < 0 or start[0] >= no_rows or 
         start[1] < 0 or start[1] >= no_columns or 
@@ -87,7 +88,7 @@ def search(maze, start, end):
     # Use None as parent if not defined
     start_node = Node(parent=None, position=start)
     start_node.g = 0            # cost from start Node
-    start_node.h = heuristic_distance(end)     # heuristic estimated cost to end Node
+    start_node.h = start_node.heuristic_distance(end)     # heuristic estimated cost to end Node
     start_node.f = start_node.g + start_node.h
 
     end_node = Node(parent=None, position=end)
@@ -151,7 +152,7 @@ def search(maze, start, end):
         # DONE: Get the current node with the lowest f value
         current_node = None
         current_fscore = None
-        for position, node in sorted(yet_to_visit_dict.items(), key=lambda n: n.f):
+        for position, node in sorted(yet_to_visit_dict.items(), key=lambda item: item[1].f, reverse=True):
             current_fscore = node.f
             current_node = node
 
@@ -197,13 +198,13 @@ def search(maze, start, end):
         for child in children:
 
             # DONE PART 4 Child is on the visited dict (use get method to check if child is in visited dict, if not found then default value is False)
-            if visited_dict.get(child, False):
+            if visited_dict.get(child.position, False):
                 continue
 
             # DONE PART 4 Create the f, g, and h values
-            child.g = maze[child.position()]
+            child.g = maze[child.position]
             # Heuristic costs calculated here, this is using eucledian distance
-            child.h = child.distance(goal.position)
+            child.h = child.heuristic_distance(end_node.position)
 
             child.f = child.g + child.h
 

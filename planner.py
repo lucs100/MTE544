@@ -45,8 +45,8 @@ class planner:
         endPoseCart = np.array(endPoseCart)[:2]
 
         # DONE: Convert to pixel coordinates using the m_utilites
-        startPose = self.m_utilites.cell_2_position(startPoseCart)
-        endPose = self.m_utilites.cell_2_position(endPoseCart)
+        startPose = self.m_utilites.position_2_cell(startPoseCart)
+        endPose = self.m_utilites.position_2_cell(endPoseCart)
 
         # convert to tuple
         startPose = (startPose[0], startPose[1])
